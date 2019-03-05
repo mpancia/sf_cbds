@@ -195,11 +195,13 @@ join_mohcd_soma_west <- function(mohcd_projects, soma_west_joined){
            -`to_st`,
            -`from_st`,
            -`street`,
+           -`st_type`,
            -`project_location_address`,
            -`project_location_zip`,
            -`project_address`,
            -`street_type`,
            -`street_number`,
+           -`street_name`,
            -`datemap_dr`,
            -`datemap_ad`,
            -`planning_neighborhood`,
@@ -218,6 +220,5 @@ join_mohcd_soma_west <- function(mohcd_projects, soma_west_joined){
            -`X..computed_region_qgnn_b9vv`)
   joined %>% 
     mutate_at(vars(contains('unit')), .funs = list(as.numeric)) %>%
-    mutate_at(vars(contains('total')), .funs = list(as.numeric)) %>% 
-    mutate_at(vars(contains('year')), .funs = list(as.numeric))
+    mutate_at(vars(contains('total')), .funs = list(as.numeric))
 }
