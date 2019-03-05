@@ -13,6 +13,8 @@ SOMA_WEST_CTAC_JSON_LOCATION <- here('output', 'soma_west_ctac.geojson')
 SOMA_WEST_CTAC_CSV_LOCATION <- here('output', 'soma_west_ctac.csv')
 SOMA_WEST_MOHCD_JSON_LOCATION <- here('output', 'soma_west_mohcd.geojson')
 SOMA_WEST_MOHCD_CSV_LOCATION <- here('output', 'soma_west_mohcd.csv')
+SOMA_WEST_REPORT_LOCATION <- here('reports', 'soma_west.Rmd')
+SOMA_WEST_REPORT_OUTPUT_LOCATION <- here('output', 'soma_west.pdf')
 
 plan <- drake::drake_plan(
   soma_west_parcels = parse_soma_west_tables(),
@@ -38,7 +40,11 @@ plan <- drake::drake_plan(
   readr::write_csv(soma_west_ctac %>% as.data.frame %>% select(-geometry), file_out(SOMA_WEST_CTAC_CSV_LOCATION)),
   sf::st_write(soma_west_mohcd, file_out(SOMA_WEST_MOHCD_JSON_LOCATION), delete_dsn=TRUE),
   readr::write_csv(soma_west_mohcd %>% as.data.frame %>% select(-geometry), file_out(SOMA_WEST_MOHCD_CSV_LOCATION)),
-  strings_in_dots = "literals"
+  soma_west_report = rmarkdown::render(
+    knitr_in(SOMA_WEST_REPORT_LOCATION),
+    output_file = file_out(SOMA_WEST_REPORT_OUTPUT_LOCATION),
+    quiet = TRUE),
+  strings_in_dots = "literals",
 )
 
 drake::make(plan, verbose = TRUE)

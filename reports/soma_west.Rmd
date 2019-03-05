@@ -1,0 +1,21 @@
+---
+title: "Soma West CBD Analysis"
+output: html_document
+---
+
+```{r content, message=FALSE, warning=FALSE, include=FALSE}
+library(drake)
+library(tidyverse)
+library(sf)
+loadd("soma_west_mohcd")
+loadd("soma_west_ctac")
+loadd("soma_west_joined")
+```
+
+This is a brief analysis of the SoMa West CBD. As per the engineers report, there is a total assessment of \$3,965,915.00 for 2020. According to the same report, \$447,640.83 or 11.75% of this money comes from *public* land, but there is additional private, residential land being used to provide low-income housing. 
+
+By taking the [MOHCD](https://sfmohcd.org/) data about city-subsidized housing (found [here](https://data.sfgov.org/Housing-and-Buildings/Map-of-MOHCD-s-Affordable-Rental-Portfolio/2hwb-ndvk/data)) and joinng it with the parcel data extracted from the engineers report, we also see that there is a large amount of money being taken from low-income housing projects. 
+
+All together, there are at least `r soma_west_mohcd$project_id %>% unique %>% length` projects that contribute at least \$`r soma_west_mohcd$assessment_total %>% sum %>% prettyNum(scientific=FALSE, big.mark=",")` (or `r soma_west_mohcd$assessment_pct %>% sum`% of the total assessment). Given that 7.56% of the total budget is earmarked for "marketing and advocacy", this implies that at least $`r (.756 *(447640.83 + (soma_west_mohcd$assessment_total %>% sum))) %>% prettyNum(scientific=FALSE, big.mark=",", digits = 2)` of public money or money coming from low-income housing providers will be spent on marketing and/or advocacy efforts. 
+
+Because (as reported by [WRAP](https://wraphome.org/?smd_process_download=1&download_id=12551)) this "advocacy" often comes in the form of pushing for anti-homeless legislation at both the local and state level, this money is being taken from people whose interests are not being represented: the public is paying for anti-homeless lobbying, which deteriorates both the moral and physical character of the city and low-income housing providers are in the same boat -- these polices hurt those most perhipheral to the people they are trying to help.
