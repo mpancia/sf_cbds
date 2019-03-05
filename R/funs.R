@@ -177,7 +177,47 @@ join_ctac_soma_west <- function(ctac_projects_coded, soma_west_joined){
 
 join_mohcd_soma_west <- function(mohcd_projects, soma_west_joined){
   mohcd_projects <- sf::st_transform(mohcd_projects, sf::st_crs(soma_west_joined))
-  sf::st_join(soma_west_joined, mohcd_projects, left = FALSE) %>%
+  joined <- sf::st_join(soma_west_joined, mohcd_projects, left = FALSE) %>%
     group_by(parcel) %>%
-    slice(c(1))
+    slice(c(1)) %>% 
+    select(-`X..computed_region_fyvs_ahh9`,
+           -`X..computed_region_6qbp_sg9q`,
+           -`X..computed_region_p5aj_wyqh`,
+           -`latitude`,
+           -`longitude`,
+           -`X..computed_region_bh8s_q3mv`,
+           -`X..computed_region_yftq_j783`,
+           -`X..computed_region_26cr_cadq`,
+           -`project_location_city`,
+           -`mapblklot`,
+           -`multigeom`,
+           -`asr_secure`,
+           -`to_st`,
+           -`from_st`,
+           -`street`,
+           -`project_location_address`,
+           -`project_location_zip`,
+           -`project_address`,
+           -`street_type`,
+           -`street_number`,
+           -`datemap_dr`,
+           -`datemap_ad`,
+           -`planning_neighborhood`,
+           -`project_location_state`,
+           -`daterec_ad`,
+           -`daterec_dr`,
+           -`blklot`,
+           -`target_fid`,
+           -`join_count`,
+           -`odd_even`,
+           -`supervisor_district`,
+           -`neighborhood`,
+           -`owner`,
+           -`X..computed_region_rxqg_mtj9`,
+           -`X..computed_region_ajp5_b2md`,
+           -`X..computed_region_qgnn_b9vv`)
+  joined %>% 
+    mutate_at(vars(contains('unit')), .funs = list(as.numeric)) %>%
+    mutate_at(vars(contains('total')), .funs = list(as.numeric)) %>% 
+    mutate_at(vars(contains('year')), .funs = list(as.numeric))
 }
