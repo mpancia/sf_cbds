@@ -22,6 +22,7 @@ SOCRATA_EMAIL <- Sys.getenv("SF_SOCRATA_EMAIL")
 SOCRATA_PASSWORD <- Sys.getenv("SF_SOCRATA_PASSWORD")
 
 SF_PARCEL_SOCRATA_ENDPOINT <- "https://data.sfgov.org/resource/6b2n-v87s.geojson"
+SF_MOHCD_SOCRATA_ENDPOINT <- "https://data.sfgov.org/resource/yd5s-bd6e.geojson"
 
 get_sf_parcel_data <- function(lot_nums, block_nums){
   blocklots <- paste0(block_nums, lot_nums)
@@ -30,6 +31,18 @@ get_sf_parcel_data <- function(lot_nums, block_nums){
     soql::soql_add_endpoint(SF_PARCEL_SOCRATA_ENDPOINT) %>%
     soql::soql_where(blocklot_where) %>%
     soql::soql_order('blklot') %>%
+    soql::soql_limit(50000) %>%
+    as.character()
+  response <- httr::GET(query, httr::authenticate(SOCRATA_EMAIL, SOCRATA_PASSWORD))
+  cont <- httr::content(response, as = 'text')
+  df  <- sf::st_read(cont)
+  df <- df[!sf::st_is_empty(df$geometry),]
+  df
+}
+
+get_mohcd_data <- function(){
+  query <- soql() %>%
+    soql::soql_add_endpoint(SF_MOHCD_SOCRATA_ENDPOINT) %>%
     soql::soql_limit(50000) %>%
     as.character()
   response <- httr::GET(query, httr::authenticate(SOCRATA_EMAIL, SOCRATA_PASSWORD))
@@ -158,6 +171,13 @@ geocode_ctac <- function(ctac_projects){
 join_ctac_soma_west <- function(ctac_projects_coded, soma_west_joined){
   ctac_projects_coded <- sf::st_transform(ctac_projects_coded, sf::st_crs(soma_west_joined))
   sf::st_join(soma_west_joined, ctac_projects_coded, left = FALSE) %>%
+    group_by(parcel) %>%
+    slice(c(1))
+}
+
+join_mohcd_soma_west <- function(mohcd_projects, soma_west_joined){
+  mohcd_projects <- sf::st_transform(mohcd_projects, sf::st_crs(soma_west_joined))
+  sf::st_join(soma_west_joined, mohcd_projects, left = FALSE) %>%
     group_by(parcel) %>%
     slice(c(1))
 }
